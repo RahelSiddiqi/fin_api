@@ -11,7 +11,7 @@ class UserRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        if(auth()->user()->is_admin){
+        if (auth()->user()->is_admin) {
             return true;
         } else {
             return false;
@@ -26,7 +26,10 @@ class UserRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            "name"     => "required|min:5",
+            "email"    => "required|email|unique:users,email",
+            "password" => "required|confirmed|min:8",
+            "is_admin" => "required|boolean",
         ];
     }
 }

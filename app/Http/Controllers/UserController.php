@@ -2,9 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
-use Illuminate\Http\Request;
 use App\Http\Requests\UserRequest;
+use App\Http\Resources\UserResource;
+use App\Models\User;
+use App\Services\ResponseService;
+use App\Services\UserService;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class UserController extends Controller
 {
@@ -13,7 +17,16 @@ class UserController extends Controller
      */
     public function index()
     {
-        //
+        $users = UserService::all();
+
+        if ($users) {
+            return UserResource::collection($users);
+        }
+
+        return ResponseService::fail(
+            "something went wrong!!",
+            Response::HTTP_INTERNAL_SERVER_ERROR
+        );
     }
 
     /**
@@ -21,7 +34,17 @@ class UserController extends Controller
      */
     public function store(UserRequest $request)
     {
-        dd($request->all());
+        $data = $request->validated();
+        $user = UserService::store($data);
+
+        if ($user) {
+            return new UserResource($user);
+        }
+
+        return ResponseService::fail(
+            "something went wrong!!",
+            Response::HTTP_INTERNAL_SERVER_ERROR
+        );
     }
 
     /**
