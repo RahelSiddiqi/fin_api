@@ -3,12 +3,18 @@
 namespace App\Http\Controllers;
 
 use App\Services\ReportService;
+use App\Services\ResponseService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Gate;
 
 class ReportController extends Controller
 {
     public function index(): JsonResponse
     {
+        if (!Gate::check('proceed')) {
+            return ResponseService::unauthenticated();
+        }
+
         $data = ReportService::generate();
         if (!$data) {
             return response()->json([

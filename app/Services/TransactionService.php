@@ -2,10 +2,10 @@
 
 namespace App\Services;
 
-use App\Models\User;
 use App\Models\Transaction;
-use Illuminate\Support\Collection;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Collection;
 
 class TransactionService implements ServiceInterface
 {
@@ -15,15 +15,21 @@ class TransactionService implements ServiceInterface
     public static function all(): Collection | null
     {
         $query = Transaction::query();
-        if (request('payer')) {
-            $query = $query->with('user');
+
+        if (!auth()->user()->is_admin) {
+            $query = $query->where('user_id', auth()->id());
+        } else {
+            if (request('payer')) {
+                $query = $query->with('user');
+            }
+            if (request('payer_id')) {
+                $query = $query->where('user_id', request('payer_id'))->with('user');
+            }
+            if (request('payments')) {
+                $query = $query->with('payments');
+            }
         }
-        if (request('payer_id')) {
-            $query = $query->where('user_id', request('payer_id'))->with('user');
-        }
-        if (request('payments')) {
-            $query = $query->with('payments');
-        }
+
         $transactions = $query->get();
         if ($transactions) {
             return $transactions;
@@ -38,9 +44,14 @@ class TransactionService implements ServiceInterface
     {
         $query = Transaction::query();
 
-        if (request('payments')) {
-            $query = $query->with('payments');
+        if (!auth()->user()->is_admin) {
+            $query = $query->where('user_id', auth()->id());
+        } else {
+            if (request('payments')) {
+                $query = $query->with('payments');
+            }
         }
+
         $transaction = $query->find($id);
 
         if ($transaction) {
@@ -58,23 +69,23 @@ class TransactionService implements ServiceInterface
     {
         try {
             $user = UserService::get($data['payer_id']);
-            if($user->is_admin) {
+            if ($user->is_admin) {
                 return false;
             }
             if ($data['is_vat_inc']) {
-                $total = $data['amount'] + $data['amount'] * ($data['vat'] /100);
+                $total = $data['amount'] + $data['amount'] * ($data['vat'] / 100);
             } else {
-                $total =$data['amount'];
+                $total = $data['amount'];
             }
 
             $data = [
-                'amount' => $data['amount'],
-                'user_id' => $data['payer_id'],
-                'due_on' => $data['due_on'],
-                'vat' => $data['vat'],
-                'is_vat_inc' => $data['is_vat_inc'],
+                'amount'       => $data['amount'],
+                'user_id'      => $data['payer_id'],
+                'due_on'       => $data['due_on'],
+                'vat'          => $data['vat'],
+                'is_vat_inc'   => $data['is_vat_inc'],
                 'total_amount' => $total,
-                'paid_amount' => 0,
+                'paid_amount'  => 0,
             ];
 
             $transaction = Transaction::create($data);

@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\LoginRequest;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
-use App\Http\Requests\LoginRequest;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Hash;
 
@@ -13,10 +13,10 @@ class LoginController extends Controller
     /**
      * Handle the incoming request.
      */
-    public function __invoke(LoginRequest $request) : JsonResponse
+    public function __invoke(LoginRequest $request): JsonResponse
     {
         $credentials = $request->validated();
-       $user = User::where('email', $request->email)->first();
+        $user        = User::where('email', $request->email)->first();
 
         if (!$user || !Hash::check($request->password, $user->password)) {
             return response()->json([
@@ -27,7 +27,7 @@ class LoginController extends Controller
         $token = $user->createToken($request->device_name)->plainTextToken;
 
         return response()->json([
-            'token' => $token
+            'token' => $token,
         ], Response::HTTP_OK);
     }
 }

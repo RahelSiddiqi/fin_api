@@ -8,6 +8,7 @@ use App\Models\Transaction;
 use App\Services\ResponseService;
 use App\Services\TransactionService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class TransactionController extends Controller
 {
@@ -16,7 +17,6 @@ class TransactionController extends Controller
         $transactions = TransactionService::all();
 
         if ($transactions) {
-
             if (!$transactions->count()) {
                 return ResponseService::notFound('transaction');
             }
@@ -26,8 +26,15 @@ class TransactionController extends Controller
         return ResponseService::fail();
     }
 
+    /**
+     * @param TransactionRequest $request
+     */
     public function store(TransactionRequest $request)
     {
+        if (!Gate::check('proceed')) {
+            return ResponseService::unauthenticated();
+        }
+
         $data = $request->validated();
 
         $transaction = TransactionService::store($data);
@@ -39,6 +46,9 @@ class TransactionController extends Controller
         return ResponseService::fail();
     }
 
+    /**
+     * @param int $transaction
+     */
     public function show(int $transaction)
     {
         $transaction = TransactionService::get($transaction);
@@ -48,14 +58,20 @@ class TransactionController extends Controller
         }
 
         return ResponseService::fail();
-
     }
 
+    /**
+     * @param Request $request
+     * @param Transaction $transaction
+     */
     public function update(Request $request, Transaction $transaction)
     {
         return ResponseService::unavailable('update transaction');
     }
 
+    /**
+     * @param Transaction $transaction
+     */
     public function destroy(Transaction $transaction)
     {
         return ResponseService::unavailable('delete transaction');
