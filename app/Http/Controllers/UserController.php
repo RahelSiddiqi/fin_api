@@ -8,7 +8,6 @@ use App\Models\User;
 use App\Services\ResponseService;
 use App\Services\UserService;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 
 class UserController extends Controller
 {
@@ -23,6 +22,9 @@ class UserController extends Controller
         return ResponseService::fail();
     }
 
+    /**
+     * @param UserRequest $request
+     */
     public function store(UserRequest $request)
     {
         $data = $request->validated();
@@ -35,18 +37,26 @@ class UserController extends Controller
         return ResponseService::fail();
     }
 
-
+    /**
+     * @param User $user
+     */
     public function show(User $user)
     {
         //
     }
 
-
+    /**
+     * @param Request $request
+     * @param User $user
+     */
     public function update(Request $request, User $user)
     {
         //
     }
 
+    /**
+     * @param User $user
+     */
     public function destroy(User $user)
     {
         //

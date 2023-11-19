@@ -13,15 +13,18 @@ class ReportController extends Controller
         if (!$data) {
             return response()->json([
                 'message' => 'please provide start and end date',
-                'code' => 500
+                'code'    => 500,
             ], 200);
         }
-        $data = $data->map( fn($item) => (array)$item);
+        $data = $data->map(fn($item) => [
+            "month"               => $item->month,
+            "year"                => $item->year,
+            "amount"              => $item->trans_amount,
+            "paid"                => $item->total_paid,
+            $item->payment_status => $item->trans_amount - $item->total_paid,
+        ]
+        );
 
-        $grouped = $data->mapToGroups(function (array $item, int $key) {
-            return [$item['year'] => $item];
-        });
-
-        dd($grouped);
+        return response()->json($data, 200);
     }
 }
