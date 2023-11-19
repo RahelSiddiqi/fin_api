@@ -13,9 +13,30 @@ class UserService implements ServiceInterface
      */
     public static function all(): Collection | null
     {
-        $users = User::all();
+        $query = User::query()->where('is_admin', 0);
+        if (request('payment')) {
+            $query = $query->with('transactions.payments');
+        }else {
+            if (request('transaction')) {
+                $query = $query->with('transactions');
+            }
+        }
+
+        $users = $query->get();
         if ($users) {
             return $users;
+        }
+        return null;
+    }
+
+    /**
+     * @param array $data
+     */
+    public static function get($id): Model | null
+    {
+        $user = User::find($id);
+        if ($user) {
+            return $user;
         }
         return null;
     }

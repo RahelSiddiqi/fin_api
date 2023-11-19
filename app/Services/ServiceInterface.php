@@ -15,6 +15,11 @@ interface ServiceInterface
     /**
      * @param array $data
      */
+    public static function get(int $id): Model | null;
+
+    /**
+     * @param array $data
+     */
     public static function store(array $data): Model | bool;
 
     /**

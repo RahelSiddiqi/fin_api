@@ -12,9 +12,6 @@ use Illuminate\Http\Response;
 
 class UserController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
         $users = UserService::all();
@@ -23,15 +20,9 @@ class UserController extends Controller
             return UserResource::collection($users);
         }
 
-        return ResponseService::fail(
-            "something went wrong!!",
-            Response::HTTP_INTERNAL_SERVER_ERROR
-        );
+        return ResponseService::fail();
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(UserRequest $request)
     {
         $data = $request->validated();
@@ -41,31 +32,21 @@ class UserController extends Controller
             return new UserResource($user);
         }
 
-        return ResponseService::fail(
-            "something went wrong!!",
-            Response::HTTP_INTERNAL_SERVER_ERROR
-        );
+        return ResponseService::fail();
     }
 
-    /**
-     * Display the specified resource.
-     */
+
     public function show(User $user)
     {
         //
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
+
     public function update(Request $request, User $user)
     {
         //
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(User $user)
     {
         //

@@ -14,11 +14,18 @@ class UserResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        return [
-            "name"     => $request->name,
-            "email"    => $request->email,
-            "is_admin" => $request->is_admin,
-            "since"    => $request->created_at->format('d m, Y'),
+        $data = [
+            "id"        => $this->id,
+            "name"      => $this->name,
+            "email"     => $this->email,
+            "is_admin"  => $this->is_admin,
+            "since"     => $this->created_at->format('d M, Y'),
         ];
+
+        if ($this->relationLoaded('transactions')) {
+            $data['transaction'] = TransactionResource::collection($this->transactions);
+        }
+
+        return $data;
     }
 }
